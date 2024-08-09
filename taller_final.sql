@@ -104,7 +104,7 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `contar_socios` () RETURNS INT(11)  B
             LEAVE read_loop;
         END IF;
         SET total_socios = total_socios + 1;
-    END LOOP;
+    END;
 
     -- Cerrar el cursor
     CLOSE cursor_socios;
