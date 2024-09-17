@@ -170,7 +170,7 @@ END$$
 SELECT Contar_Socios();
 --------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE FUNCTION `Dias_En_Prestamo` (`ISBN` BIGINT) RETURNS INT(11)  BEGIN
+CREATE FUNCTION `Dias_En_Prestamo` (`ISBN`) RETURNS INT(11)  BEGIN
     DECLARE total_dias INT DEFAULT 0;
 
     -- Sumar la diferencia en días entre fecha de devolución y fecha de préstamo para el libro especificado
