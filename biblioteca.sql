@@ -191,17 +191,19 @@ INSERT INTO audi_socio (id_audi, socNumero_audi, socNombre_anterior, socApellido
 --
 
 CREATE TABLE tbl_auditoria_libro (
-  audit_id int(11) NOT NULL,
-  lib_isbn varchar(13) DEFAULT NULL,
-  lib_titulo varchar(255) DEFAULT NULL,
-  operacion varchar(50) DEFAULT NULL,
-  usuario varchar(255) DEFAULT NULL,
-  fecha timestamp NOT NULL DEFAULT current_timestamp(),
-  old_lib_titulo varchar(255) DEFAULT NULL,
-  old_lib_autor varchar(255) DEFAULT NULL,
-  old_lib_numpaginas int(11) DEFAULT NULL,
-  old_lib_editorial varchar(255) DEFAULT NULL
+  audit_id INT(11) NOT NULL AUTO_INCREMENT,
+  lib_isbn BIGINT(20) DEFAULT NULL,
+  lib_titulo VARCHAR(45) DEFAULT NULL,
+  lib_genero VARCHAR(45) DEFAULT NULL,
+  lib_numeroPaginas INT(11) DEFAULT NULL,
+  lib_diasPrestamo TINYINT(4) DEFAULT NULL,
+  operacion VARCHAR(50) DEFAULT NULL,
+  usuario VARCHAR(255) DEFAULT NULL,
+  fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (audit_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
 
 -- --------------------------------------------------------
 
@@ -327,18 +329,22 @@ CREATE TRIGGER trg_audit_update_libro BEFORE UPDATE ON tbl_libro FOR EACH ROW BE
         OLD.lib_diasPrestamo,
         NEW.lib_diasPrestamo
     );
-END
 $$
 DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER trg_auditoria_libro_delete AFTER DELETE ON tbl_libro FOR EACH ROW BEGIN
+
+
+    DELIMITER $$
+
+CREATE TRIGGER trg_audit_delete_libro
+AFTER DELETE ON tbl_libro
+FOR EACH ROW
+BEGIN
     INSERT INTO tbl_auditoria_libro (
         lib_isbn,
         lib_titulo,
-        old_lib_autor,
-        old_lib_editorial,
-        old_lib_numpaginas,
-        old_lib_titulo,
+        lib_genero,
+        lib_numeroPaginas,
+        lib_diasPrestamo,
         operacion,
         usuario,
         fecha
@@ -346,17 +352,18 @@ CREATE TRIGGER trg_auditoria_libro_delete AFTER DELETE ON tbl_libro FOR EACH ROW
     VALUES (
         OLD.lib_isbn,
         OLD.lib_titulo,
-        (SELECT aut_apellido FROM tbl_autor WHERE aut_codigo = OLD.lib_isbn), -- Si la autoría está ligada al ISBN o a algún campo específico
-        lib_editorial,
-        lib_numeroPaginas,
-        lib_titulo,
+        OLD.lib_genero,
+        OLD.lib_numeroPaginas,
+        OLD.lib_diasPrestamo,
         'DELETE',
         USER(),
         NOW()
     );
-END
-$$
+END$$
+
 DELIMITER ;
+
+
 
 -- --------------------------------------------------------
 
